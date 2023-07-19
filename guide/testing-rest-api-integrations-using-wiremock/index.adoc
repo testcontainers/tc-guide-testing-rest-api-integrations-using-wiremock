@@ -308,14 +308,6 @@ Create *src/test/resources/com/testcontainers/demo/AlbumControllerTestcontainers
 Now if you run the test, the call to photo-service API will receive the response using WireMock stubbings
 defined in *mocks-config.json* file.
 
-[TIP]
-====
-Testcontainers WireMock modules are available for *Go* and *Python* languages as well.
-====
-
-For more information on using Testcontainers WireMock module,
-please refer the documentation at https://wiremock.org/docs/solutions/testcontainers/.
-
 == Run tests
 
 [source,shell]
@@ -333,6 +325,14 @@ which will act as the photo-service, serving the mock responses as per the confi
 == Summary
 We have learned how to integrate 3rd party HTTP APIs in a Spring Boot application
 and test it using Testcontainers WireMock module.
+
+[TIP]
+====
+Testcontainers WireMock modules are available for *Go* and *Python* languages as well.
+====
+
+For more information on using Testcontainers WireMock module,
+please refer the documentation at https://wiremock.org/docs/solutions/testcontainers/.
 
 To learn more about Testcontainers visit http://testcontainers.com
 
