@@ -163,6 +163,7 @@ Let us understand what is going on in this test.
 * We are using the RestAssured library to test our API endpoint, so we captured the random port on which the application started and initialized RestAssured *port*.
 * We have registered the *photos.api.base-url* property pointing to WireMock endpoint URL.
 * In the *shouldGetAlbumById()* test, we have set the expected mock response for `/albums/\{albumId}/photos` API call and make a request to our application endpoint `/api/albums/\{albumId}` and verified the response.
+* In the *shouldReturnServerErrorWhenPhotoServiceCallFailed()* test, we have set the expected mock response for `/albums/\{albumId}/photos` API call to return InternalServerError status code 500 and make a request to our application endpoint `/api/albums/\{albumId}` and verified the response.
 
 == Stubbing using JSON mapping files
 In the previous test, we saw how to stub an API using *wireMock.stubFor(...)*.
@@ -190,6 +191,9 @@ Create *src/test/resources/wiremock/mappings/get-album-photos.json* file as foll
             "title": "accusamus beatae ad facilis cum similique qui sunt",
             "url": "https://via.placeholder.com/600/92c952",
             "thumbnailUrl": "https://via.placeholder.com/150/92c952"
+          },
+          {
+            ...
           }
         ]
       }
