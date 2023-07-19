@@ -20,7 +20,6 @@ repositories {
 }
 
 ext {
-    set('testcontainers.version', "1.18.3")
     set('wiremockTestcontainersVersion', "1.0-alpha-5")
 }
 

@@ -34,20 +34,22 @@ the https://testcontainers.com/modules/wiremock/[Testcontainers WireMock module]
 You can create a new Spring Boot project from https://start.spring.io[Spring Initializr] by selecting the
 *Spring Web*, and *Testcontainers* starters.
 
-Once the application is generated, add the following *RestAssured* and *WireMock* libraries as test dependencies.
+Once the application is generated, add the *RestAssured* and *WireMock* libraries as test dependencies.
 
 [source,groovy,indent=0]
 ----
-include::{codebase}/build.gradle[lines="17..20,27,32..35"]
+include::{codebase}/build.gradle[lines="17..26,31..35"]
 ----
 
 Assume we are building an application to manage video albums, and we are going to use a 3rd party
 REST API to manage the image and video assets. For this guide, we are going to use a publicly available
 REST API https://jsonplaceholder.typicode.com/ as a 3rd party *photo-service* to store album photos.
 
-We will implement a REST API endpoint to fetch an album for the given albumId.
-This API internally talks to the photo-service to fetch the photos for that album.
-https://wiremock.org/[WireMock] is a tool for building mock APIs.
+We will implement a REST API endpoint to fetch an album for the given *albumId*.
+This API internally talks to the *photo-service* to fetch the photos for that album.
+
+We will use https://wiremock.org/[WireMock], which is a tool for building mock APIs,
+to mock the external service interactions and test our API endpoints.
 Testcontainers provides the https://testcontainers.com/modules/wiremock/[Testcontainers WireMock module]
 so that we can run WireMock as a Docker container.
 
@@ -119,7 +121,7 @@ It is better to mock the external API interactions at HTTP protocol level instea
 the *photoServiceClient.getPhotos(albumId)* method because you will be able to verify any
 marshaling/unmarshalling errors, simulate network latency issues, etc.
 
-We can create an instance of WireMockServer using *WireMockExtension* and
+We can create an instance of WireMock server using *WireMockExtension* and
 set the expectations for any API call as follows:
 
 [source,java]
@@ -130,25 +132,25 @@ static WireMockExtension wireMock = WireMockExtension.newInstance()
         .build();
 
 wireMock.stubFor(
-    WireMock.get(urlMatching("/albums/*/photos"))
-        .willReturn(
-            aResponse()
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(
-                        """
-                        [
-                           {
-                               "id": 1,
-                               "title": "accusamus beatae ad facilis cum similique qui sunt",
-                               "url": "https://via.placeholder.com/600/92c952",
-                               "thumbnailUrl": "https://via.placeholder.com/150/92c952"
-                           }
-                        ]
-                        """))
+   WireMock.get(urlMatching("/albums/*/photos"))
+    .willReturn(
+      aResponse()
+        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .withBody(
+        """
+        [
+           {
+               "id": 1,
+               "title": "accusamus beatae ad facilis cum similique qui sunt",
+               "url": "https://via.placeholder.com/600/92c952",
+               "thumbnailUrl": "https://via.placeholder.com/150/92c952"
+           }
+        ]
+        """))
 );
 ----
 
-So, let us write the test for GET `/api/albums/\{albumId}` endpoint as follows:
+Let us write the test for our GET `/api/albums/\{albumId}` API endpoint as follows:
 
 [source,java]
 ----
@@ -160,7 +162,7 @@ Let us understand what is going on in this test.
 * We have annotated the test class with the *@SpringBootTest* annotation to write an integration test which loads the complete Spring application context.
 * We are using the RestAssured library to test our API endpoint, so we captured the random port on which the application started and initialized RestAssured *port*.
 * We have registered the *photos.api.base-url* property pointing to WireMock endpoint URL.
-* During the *shouldGetAlbumById()* test, we have set the expected mock response for `/albums/\{albumId}/photos` API call and make a request to our application endpoint `/api/albums/\{albumId}` and verified the response.
+* In the *shouldGetAlbumById()* test, we have set the expected mock response for `/albums/\{albumId}/photos` API call and make a request to our application endpoint `/api/albums/\{albumId}` and verified the response.
 
 == Stubbing using JSON mapping files
 In the previous test, we saw how to stub an API using *wireMock.stubFor(...)*.
@@ -202,7 +204,11 @@ Now you can initialize WireMock by loading the stub mappings from mapping files 
 ----
 @RegisterExtension
 static WireMockExtension wireMock = WireMockExtension.newInstance()
-    .options(wireMockConfig().dynamicPort().usingFilesUnderClasspath("wiremock"))
+     .options(
+         wireMockConfig()
+            .dynamicPort()
+            .usingFilesUnderClasspath("wiremock")
+    )
     .build();
 ----
 
@@ -295,9 +301,12 @@ Create *src/test/resources/com/testcontainers/demo/AlbumControllerTestcontainers
 }
 ----
 
+Now if you run the test, the call to photo-service API will receive the response using WireMock stubbings
+defined in *mocks-config.json* file.
+
 [TIP]
 ====
-Testcontainers WireMock modules are available for Go and Python languages as well.
+Testcontainers WireMock modules are available for *Go* and *Python* languages as well.
 ====
 
 For more information on using Testcontainers WireMock module,

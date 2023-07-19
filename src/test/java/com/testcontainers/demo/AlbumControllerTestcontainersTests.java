@@ -56,7 +56,18 @@ class AlbumControllerTestcontainersTests {
     }
 
     @Test
-    void shouldReturnEmpty() {
+    void shouldReturnServerErrorWhenPhotoServiceCallFailed() {
+        Long albumId = 2L;
+
+        given().contentType(ContentType.JSON)
+                .when()
+                .get("/api/albums/{albumId}", albumId)
+                .then()
+                .statusCode(500);
+    }
+
+    @Test
+    void shouldReturnEmptyPhotos() {
         Long albumId = 3L;
 
         given().contentType(ContentType.JSON)
@@ -65,17 +76,6 @@ class AlbumControllerTestcontainersTests {
                 .then()
                 .statusCode(200)
                 .body("albumId", is(albumId.intValue()))
-                .body("photos", hasSize(1));
-    }
-
-    @Test
-    void shouldReturn404StatusWhenAlbumNotFound() {
-        Long albumId = 2L;
-
-        given().contentType(ContentType.JSON)
-                .when()
-                .get("/api/albums/{albumId}", albumId)
-                .then()
-                .statusCode(404);
+                .body("photos", hasSize(0));
     }
 }

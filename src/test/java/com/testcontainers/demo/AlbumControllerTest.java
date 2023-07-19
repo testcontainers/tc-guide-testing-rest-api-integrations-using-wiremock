@@ -79,15 +79,15 @@ class AlbumControllerTest {
     }
 
     @Test
-    void shouldReturn404StatusWhenAlbumNotFound() {
-        Long albumId = 1L;
+    void shouldReturnServerErrorWhenPhotoServiceCallFailed() {
+        Long albumId = 2L;
         wireMock.stubFor(WireMock.get(urlMatching("/albums/" + albumId + "/photos"))
-                .willReturn(aResponse().withStatus(404)));
+                .willReturn(aResponse().withStatus(500)));
 
         given().contentType(ContentType.JSON)
                 .when()
                 .get("/api/albums/{albumId}", albumId)
                 .then()
-                .statusCode(404);
+                .statusCode(500);
     }
 }
