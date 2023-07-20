@@ -25,7 +25,7 @@ class AlbumControllerTestcontainersTests {
     private Integer port;
 
     @Container
-    static WireMockContainer wiremockServer = new WireMockContainer("2.35.0")
+    static WireMockContainer wiremockServer = new WireMockContainer("wiremock/wiremock:2.35.0")
             .withMapping("photos-by-album", AlbumControllerTestcontainersTests.class, "mocks-config.json")
             .withFileFromResource(
                     "album-photos-response.json",

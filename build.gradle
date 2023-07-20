@@ -20,7 +20,7 @@ repositories {
 }
 
 ext {
-    set('wiremockTestcontainersVersion', "1.0-alpha-5")
+    set('wiremockTestcontainersVersion', "1.0-alpha-6")
 }
 
 dependencies {
