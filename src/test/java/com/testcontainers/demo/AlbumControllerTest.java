@@ -24,35 +24,37 @@ import org.springframework.test.context.DynamicPropertySource;
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class AlbumControllerTest {
 
-    @LocalServerPort
-    private Integer port;
+  @LocalServerPort
+  private Integer port;
 
-    @RegisterExtension
-    static WireMockExtension wireMock = WireMockExtension.newInstance()
-            .options(wireMockConfig().dynamicPort())
-            .build();
+  @RegisterExtension
+  static WireMockExtension wireMock = WireMockExtension
+    .newInstance()
+    .options(wireMockConfig().dynamicPort())
+    .build();
 
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("photos.api.base-url", wireMock::baseUrl);
-    }
+  @DynamicPropertySource
+  static void configureProperties(DynamicPropertyRegistry registry) {
+    registry.add("photos.api.base-url", wireMock::baseUrl);
+  }
 
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+  @BeforeEach
+  void setUp() {
+    RestAssured.port = port;
+  }
 
-    @Test
-    void shouldGetAlbumById() {
-        Long albumId = 1L;
+  @Test
+  void shouldGetAlbumById() {
+    Long albumId = 1L;
 
-        wireMock.stubFor(
-                WireMock.get(urlMatching("/albums/" + albumId + "/photos"))
-                        .willReturn(
-                                aResponse()
-                                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                                        .withBody(
-                                                """
+    wireMock.stubFor(
+      WireMock
+        .get(urlMatching("/albums/" + albumId + "/photos"))
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+            .withBody(
+              """
               [
                    {
                        "id": 1,
@@ -67,27 +69,35 @@ class AlbumControllerTest {
                        "thumbnailUrl": "https://via.placeholder.com/150/771796"
                    }
                ]
-              """)));
+              """
+            )
+        )
+    );
 
-        given().contentType(ContentType.JSON)
-                .when()
-                .get("/api/albums/{albumId}", albumId)
-                .then()
-                .statusCode(200)
-                .body("albumId", is(albumId.intValue()))
-                .body("photos", hasSize(2));
-    }
+    given()
+      .contentType(ContentType.JSON)
+      .when()
+      .get("/api/albums/{albumId}", albumId)
+      .then()
+      .statusCode(200)
+      .body("albumId", is(albumId.intValue()))
+      .body("photos", hasSize(2));
+  }
 
-    @Test
-    void shouldReturnServerErrorWhenPhotoServiceCallFailed() {
-        Long albumId = 2L;
-        wireMock.stubFor(WireMock.get(urlMatching("/albums/" + albumId + "/photos"))
-                .willReturn(aResponse().withStatus(500)));
+  @Test
+  void shouldReturnServerErrorWhenPhotoServiceCallFailed() {
+    Long albumId = 2L;
+    wireMock.stubFor(
+      WireMock
+        .get(urlMatching("/albums/" + albumId + "/photos"))
+        .willReturn(aResponse().withStatus(500))
+    );
 
-        given().contentType(ContentType.JSON)
-                .when()
-                .get("/api/albums/{albumId}", albumId)
-                .then()
-                .statusCode(500);
-    }
+    given()
+      .contentType(ContentType.JSON)
+      .when()
+      .get("/api/albums/{albumId}", albumId)
+      .then()
+      .statusCode(500);
+  }
 }

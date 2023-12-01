@@ -11,18 +11,27 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 class PhotoServiceClient {
-    private final String baseUrl;
-    private final RestTemplate restTemplate;
 
-    PhotoServiceClient(@Value("${photos.api.base-url}") String baseUrl, RestTemplateBuilder builder) {
-        this.baseUrl = baseUrl;
-        this.restTemplate = builder.build();
-    }
+  private final String baseUrl;
+  private final RestTemplate restTemplate;
 
-    List<Photo> getPhotos(Long albumId) {
-        String url = baseUrl + "/albums/{albumId}/photos";
-        ResponseEntity<List<Photo>> response =
-                restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {}, albumId);
-        return response.getBody();
-    }
+  PhotoServiceClient(
+    @Value("${photos.api.base-url}") String baseUrl,
+    RestTemplateBuilder builder
+  ) {
+    this.baseUrl = baseUrl;
+    this.restTemplate = builder.build();
+  }
+
+  List<Photo> getPhotos(Long albumId) {
+    String url = baseUrl + "/albums/{albumId}/photos";
+    ResponseEntity<List<Photo>> response = restTemplate.exchange(
+      url,
+      HttpMethod.GET,
+      null,
+      new ParameterizedTypeReference<>() {},
+      albumId
+    );
+    return response.getBody();
+  }
 }

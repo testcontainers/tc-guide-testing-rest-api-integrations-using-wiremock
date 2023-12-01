@@ -14,22 +14,24 @@ import org.springframework.web.client.RestClientResponseException;
 @RequestMapping("/api")
 class AlbumController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlbumController.class);
+  private static final Logger logger = LoggerFactory.getLogger(
+    AlbumController.class
+  );
 
-    private final PhotoServiceClient photoServiceClient;
+  private final PhotoServiceClient photoServiceClient;
 
-    AlbumController(PhotoServiceClient photoServiceClient) {
-        this.photoServiceClient = photoServiceClient;
+  AlbumController(PhotoServiceClient photoServiceClient) {
+    this.photoServiceClient = photoServiceClient;
+  }
+
+  @GetMapping("/albums/{albumId}")
+  public ResponseEntity<Album> getAlbumById(@PathVariable Long albumId) {
+    try {
+      List<Photo> photos = photoServiceClient.getPhotos(albumId);
+      return ResponseEntity.ok(new Album(albumId, photos));
+    } catch (RestClientResponseException e) {
+      logger.error("Failed to get photos", e);
+      return new ResponseEntity<>(e.getStatusCode());
     }
-
-    @GetMapping("/albums/{albumId}")
-    public ResponseEntity<Album> getAlbumById(@PathVariable Long albumId) {
-        try {
-            List<Photo> photos = photoServiceClient.getPhotos(albumId);
-            return ResponseEntity.ok(new Album(albumId, photos));
-        } catch (RestClientResponseException e) {
-            logger.error("Failed to get photos", e);
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-    }
+  }
 }

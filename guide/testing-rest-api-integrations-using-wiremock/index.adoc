@@ -38,7 +38,7 @@ Once the application is generated, add the *RestAssured* and *WireMock* librarie
 
 [source,groovy,indent=0]
 ----
-include::{codebase}/build.gradle[lines="17..26,31..35"]
+include::{codebase}/build.gradle[lines="18..27,32..35"]
 ----
 
 Assume we are building an application to manage video albums, and we are going to use a 3rd party
@@ -241,7 +241,7 @@ class AlbumControllerTestcontainersTests {
     private Integer port;
 
     @Container
-    static WireMockContainer wiremockServer = new WireMockContainer("wiremock/wiremock:2.35.0")
+    static WireMockContainer wiremockServer = new WireMockContainer("wiremock/wiremock:3.3.1")
             .withMapping("photos-by-album",
                         AlbumControllerTestcontainersTests.class,
                         "mocks-config.json");

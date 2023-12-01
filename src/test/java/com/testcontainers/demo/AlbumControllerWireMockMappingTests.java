@@ -20,58 +20,64 @@ import org.springframework.test.context.DynamicPropertySource;
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class AlbumControllerWireMockMappingTests {
 
-    @LocalServerPort
-    private Integer port;
+  @LocalServerPort
+  private Integer port;
 
-    @RegisterExtension
-    static WireMockExtension wireMockServer = WireMockExtension.newInstance()
-            .options(wireMockConfig().dynamicPort().usingFilesUnderClasspath("wiremock"))
-            .build();
+  @RegisterExtension
+  static WireMockExtension wireMockServer = WireMockExtension
+    .newInstance()
+    .options(
+      wireMockConfig().dynamicPort().usingFilesUnderClasspath("wiremock")
+    )
+    .build();
 
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("photos.api.base-url", wireMockServer::baseUrl);
-    }
+  @DynamicPropertySource
+  static void configureProperties(DynamicPropertyRegistry registry) {
+    registry.add("photos.api.base-url", wireMockServer::baseUrl);
+  }
 
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+  @BeforeEach
+  void setUp() {
+    RestAssured.port = port;
+  }
 
-    @Test
-    void shouldGetAlbumById() {
-        Long albumId = 1L;
+  @Test
+  void shouldGetAlbumById() {
+    Long albumId = 1L;
 
-        given().contentType(ContentType.JSON)
-                .when()
-                .get("/api/albums/{albumId}", albumId)
-                .then()
-                .statusCode(200)
-                .body("albumId", is(albumId.intValue()))
-                .body("photos", hasSize(2));
-    }
+    given()
+      .contentType(ContentType.JSON)
+      .when()
+      .get("/api/albums/{albumId}", albumId)
+      .then()
+      .statusCode(200)
+      .body("albumId", is(albumId.intValue()))
+      .body("photos", hasSize(2));
+  }
 
-    @Test
-    void shouldReturnServerErrorWhenPhotoServiceCallFailed() {
-        Long albumId = 2L;
+  @Test
+  void shouldReturnServerErrorWhenPhotoServiceCallFailed() {
+    Long albumId = 2L;
 
-        given().contentType(ContentType.JSON)
-                .when()
-                .get("/api/albums/{albumId}", albumId)
-                .then()
-                .statusCode(500);
-    }
+    given()
+      .contentType(ContentType.JSON)
+      .when()
+      .get("/api/albums/{albumId}", albumId)
+      .then()
+      .statusCode(500);
+  }
 
-    @Test
-    void shouldReturnEmptyPhotos() {
-        Long albumId = 3L;
+  @Test
+  void shouldReturnEmptyPhotos() {
+    Long albumId = 3L;
 
-        given().contentType(ContentType.JSON)
-                .when()
-                .get("/api/albums/{albumId}", albumId)
-                .then()
-                .statusCode(200)
-                .body("albumId", is(albumId.intValue()))
-                .body("photos", hasSize(0));
-    }
+    given()
+      .contentType(ContentType.JSON)
+      .when()
+      .get("/api/albums/{albumId}", albumId)
+      .then()
+      .statusCode(200)
+      .body("albumId", is(albumId.intValue()))
+      .body("photos", hasSize(0));
+  }
 }
